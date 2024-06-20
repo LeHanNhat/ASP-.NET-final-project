@@ -1,0 +1,89 @@
+﻿@model bookingflightmvcUI.Models.Flight
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Flight</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="FlightName" class="control-label"></label>
+                <input asp-for="FlightName" class="form-control" />
+                <span asp-validation-for="FlightName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Image" class="control-label"></label>
+                <input type="file" asp-for="Image" class="form-control" />
+                <span asp-validation-for="Image" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AirportId" class="control-label"></label>
+                <select asp-for="AirportId" class="form-control" asp-items="ViewBag.AirportId"></select>
+                <span asp-validation-for="AirportId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="departureTime" class="control-label"></label>
+                <input asp-for="departureTime" class="form-control" />
+                <span asp-validation-for="departureTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="arrivalTime" class="control-label"></label>
+                <input asp-for="arrivalTime" class="form-control" />
+                <span asp-validation-for="arrivalTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AircraftType" class="control-label"></label>
+                <input asp-for="AircraftType" class="form-control" />
+                <span asp-validation-for="AircraftType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ticketPrice" class="control-label"></label>
+                <input asp-for="ticketPrice" class="form-control" />
+                <span asp-validation-for="ticketPrice" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="duration" class="control-label"></label>
+                <input asp-for="duration" class="form-control" />
+                <span asp-validation-for="duration" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="numberOfStops" class="control-label"></label>
+                <input asp-for="numberOfStops" class="form-control" />
+                <span asp-validation-for="numberOfStops" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="seatClass" class="control-label"></label>
+                <input asp-for="seatClass" class="form-control" />
+                <span asp-validation-for="seatClass" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="baggageRegulations" class="control-label"></label>
+                <input asp-for="baggageRegulations" class="form-control" />
+                <span asp-validation-for="baggageRegulations" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ancillaryServices" class="control-label"></label>
+                <input asp-for="ancillaryServices" class="form-control" />
+                <span asp-validation-for="ancillaryServices" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
