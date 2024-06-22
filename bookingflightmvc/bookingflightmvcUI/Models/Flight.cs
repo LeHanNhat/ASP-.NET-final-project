@@ -12,7 +12,7 @@ namespace bookingflightmvcUI.Models
         [Required]
         [MaxLength(100)]
         public string? FlightName { get; set; }
-        public string? Image { get; set; }
+        
 
 
         //public string departureAirportId { get; set; }
@@ -41,5 +41,7 @@ namespace bookingflightmvcUI.Models
 
         [NotMapped]
         public string AirportName { get; set; }
+        [NotMapped]
+        public int Seat { get; set; }
     }
 }

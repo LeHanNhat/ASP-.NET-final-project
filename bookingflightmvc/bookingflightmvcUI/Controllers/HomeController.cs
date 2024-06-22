@@ -2,6 +2,7 @@ using bookingflightmvcUI.Models;
 using bookingflightmvcUI.Repository;
 using Humanizer.Localisation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.IO;
@@ -19,53 +20,74 @@ namespace bookingflightmvcUI.Controllers
 
         }
 
-
-        public async Task<IEnumerable<Airport>> Airport()
+        private void PeopleDropDownList(object selectedPerson = null)
         {
-            return await _context.Airports.ToListAsync();
+            var AirportQuery = from d in _context.Airports select d;
+            ViewBag.AirportId = new SelectList(AirportQuery.AsNoTracking(), "Id", "AirportName", AirportQuery);
         }
-        public async Task<IEnumerable<Flight>> GetBooks(string sTerm = "", int airportId = 0)
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber,int airportId =0)
         {
-            sTerm = sTerm.ToLower();
-            IEnumerable<Flight> books = await (from book in _context.Flights
-                                               join genre in _context.Airports
-                                               on book.AirportId equals genre.Id
-
-                                               where string.IsNullOrWhiteSpace(sTerm) || (book != null && book.FlightName.ToLower().StartsWith(sTerm))
-                                               select new Flight
-                                               {
-                                                   Id = book.Id,
-                                                   Image = book.Image,
-                                                   AirportId = book.AirportId,
-                                                   FlightName = book.FlightName,
-                                                   departureTime = book.departureTime,
-                                                   arrivalTime = book.arrivalTime,
-                                                   AircraftType = book.AircraftType,
-                                                   ticketPrice = book.ticketPrice,
-                                                   duration = book.duration,
-                                                   numberOfStops = book.numberOfStops,
-                                                   seatClass = book.seatClass,
-                                                   
-                                                   baggageRegulations = book.baggageRegulations,
-                                                   ancillaryServices = book.ancillaryServices,
-
-                                               }
-                         ).ToListAsync();
-            if (airportId > 0)
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+            PeopleDropDownList();
+            ViewData["CurrentSort"] = sortOrder;
+            if (searchString != null)
             {
-
-                books = books.Where(a => a.AirportId == airportId).ToList();
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            ViewData["CurrentFilter"] = searchString;
+            
+            var flights = from s in _context.Flights.Include(_ => _.Airport) select s;
+            if (airportId > 0 )
+            {
+                flights = flights.Where(a => a.AirportId == airportId);
+            } 
+            
+               
+            
+            
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                flights = flights.Where(s => s.FlightName.Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    flights = flights.OrderByDescending(s => s.FlightName);
+                    break;
+                case "Date":
+                    flights = flights.OrderBy(s => s.departureTime);
+                    break;
+                case "date_desc":
+                    flights = flights.OrderByDescending(s => s.arrivalTime);
+                    break;
+                default:
+                    flights = flights.OrderBy(s => s.FlightName);
+                    break;
+            }
+            int pageSize = 3;
+            return View(await PaginatedList<Flight>.CreateAsync(flights.AsNoTracking(), pageNumber ?? 1, pageSize));
+        }
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
             }
 
-            return books;
+            var flight = await _context.Flights
+                .Include(f => f.Airport)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (flight == null)
+            {
+                return NotFound();
+            }
 
-        }
-        public async Task<IActionResult> Index(string sTerm = "", int airportId = 0)
-        {
-
-            IEnumerable<Flight> books = await GetBooks(sTerm, airportId);
-
-            return View(books);
+            return View(flight);
         }
 
         public IActionResult Privacy()
